@@ -1,0 +1,65 @@
+## servlet configuration
+server:
+  port: ${PORT:8081}
+
+## application configuration
+spring:
+  application:
+    name: ${APPLICATION_NAME:ignite-student-service}
+  datasource:
+    url: jdbc:mysql://localhost:3306/student_db?createDatabaseIfNotExist=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    initialization-mode: always
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: update
+  ## configure active profiles
+#  profiles:
+#    active: prod
+
+## eureka server configuration
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+
+# oauth2 security configuration
+security:
+  oauth2:
+    resource:
+      token-info-uri: http://localhost:8080/ignite-auth-service/oauth/check_token
+    client:
+      client-id: ignite-client
+      client-secret: 1234
+
+# oauth2 resource server configuration
+oauth:
+  resource-id: ${RESOURCE_ID:ignite_student}
+
+# cors configuration
+accessControl:
+  allowedOrigin: ${ALLOWED_ORIGIN:*}
+  allowedMethods: ${ALLOWED_METHODS:GET, POST, PUT, PATCH, DELETE, OPTIONS}
+  maxAge: ${MAX_AGE:3600}
+  allowedHeaders: ${ALLOWED_HEADERS:*}
+
+## Payment-Microservice
+payment:
+  baseUrl: ${PAYMENT_BASE_URL:http://localhost:8080/ignite-payment-service}
+  deleteByStudentIdUrl: /api/v1/payment/delete/all/student/{studentId}
+
+## Tuition-Microservice
+tuition:
+  baseUrl: ${TUITION_BASE_URL:http://localhost:8080/ignite-tuition-service}
+  removeStudentUrl: /api/v1/tuition/remove/student/{studentId}/tuition/{tuitionId}
+
+## Auth-Microservice
+auth:
+  baseUrl: ${AUTH_BASE_URL:http://localhost:8080/ignite-auth-service}
+  createUserUrl: /api/v1/auth/users/register
+  deleteUserUrl: /api/v1/auth/users/delete/{username}
