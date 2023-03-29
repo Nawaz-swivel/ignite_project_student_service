@@ -32,7 +32,7 @@ mvn spring-boot:run
 or
 
 ```
-java -jar target/registration-0.0.1-SNAPSHOT.jar
+java -jar target/student-0.0.1-SNAPSHOT.jar
 ```
 
 ## Test
