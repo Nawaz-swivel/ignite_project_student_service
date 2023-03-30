@@ -40,7 +40,7 @@ public class StudentService {
      * This method creates a Student in the database
      *
      * @param requestDto student create dto
-     * @param token access token
+     * @param token      access token
      */
     @Transactional
     public Student createStudent(StudentCreateRequestDto requestDto, String token) {

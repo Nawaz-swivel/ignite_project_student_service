@@ -172,7 +172,7 @@ public class StudentController extends Controller {
      */
     @PostMapping(path = "/remove/student/{studentId}/tuition/{tuitionId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<ResponseWrapper> removeTuitionFromStudent(@PathVariable(name = "studentId") String studentId,
-                                                               @PathVariable(name = "tuitionId") String tuitionId) {
+                                                                    @PathVariable(name = "tuitionId") String tuitionId) {
         try {
             Student student = studentService.findById(studentId);
             if (student.getTuitionId() == null || !student.getTuitionId().equals(tuitionId)) {

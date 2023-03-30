@@ -13,9 +13,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class StudentCreateRequestDto extends RequestDto {
 
+    private static final RoleType roleType = RoleType.STUDENT;
     private String username;
     private String password;
-    private final RoleType roleType = RoleType.STUDENT;
 
     @Override
     public String toLogJson() {

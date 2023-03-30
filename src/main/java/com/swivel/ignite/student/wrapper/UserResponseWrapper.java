@@ -1,7 +1,6 @@
 package com.swivel.ignite.student.wrapper;
 
 import com.swivel.ignite.student.dto.BaseDto;
-import com.swivel.ignite.student.dto.response.StudentResponseDto;
 import com.swivel.ignite.student.dto.response.UserResponseDto;
 import com.swivel.ignite.student.enums.ResponseStatusType;
 import lombok.Getter;
