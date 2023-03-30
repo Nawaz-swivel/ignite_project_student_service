@@ -41,6 +41,13 @@ security:
 oauth:
   resource-id: ${RESOURCE_ID:ignite_student}
 
+## logging level
+logging:
+  level:
+    com.swivel.ignite.student: ${LOG_LEVEL:DEBUG}
+  file:
+    path: ${LOGPATH:D:\Swivel_Projects\Ignite\Project 1\backend\ignite-student\logs}
+
 ## Payment-Microservice
 payment:
   baseUrl: ${PAYMENT_BASE_URL:http://localhost:8080/ignite-payment-service}
