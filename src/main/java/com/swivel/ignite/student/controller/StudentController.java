@@ -5,6 +5,7 @@ import com.swivel.ignite.student.dto.response.StudentListResponseDto;
 import com.swivel.ignite.student.dto.response.StudentResponseDto;
 import com.swivel.ignite.student.entity.Student;
 import com.swivel.ignite.student.enums.ErrorResponseStatusType;
+import com.swivel.ignite.student.enums.RoleType;
 import com.swivel.ignite.student.enums.SuccessResponseStatusType;
 import com.swivel.ignite.student.exception.*;
 import com.swivel.ignite.student.service.StudentService;
@@ -45,6 +46,7 @@ public class StudentController extends Controller {
                                                          HttpServletRequest request) {
         String token = request.getHeader(AUTH_HEADER);
         try {
+            requestDto.setRoleType(RoleType.STUDENT);
             if (!requestDto.isRequiredAvailable()) {
                 log.error("Required fields missing in tuition create request DTO for creating student");
                 return getBadRequestResponse(ErrorResponseStatusType.MISSING_REQUIRED_FIELDS);

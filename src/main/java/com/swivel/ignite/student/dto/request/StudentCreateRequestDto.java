@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class StudentCreateRequestDto extends RequestDto {
 
-    private static final RoleType roleType = RoleType.STUDENT;
+    private RoleType roleType;
     private String username;
     private String password;
 
@@ -24,7 +24,6 @@ public class StudentCreateRequestDto extends RequestDto {
 
     @Override
     public boolean isRequiredAvailable() {
-        return isNonEmpty(username) && isNonEmpty(password) && roleType != null && isNonEmpty(roleType.name())
-                && roleType != RoleType.ADMIN;
+        return isNonEmpty(username) && isNonEmpty(password);
     }
 }
