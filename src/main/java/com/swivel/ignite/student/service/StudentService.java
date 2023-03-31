@@ -1,6 +1,7 @@
 package com.swivel.ignite.student.service;
 
 import com.swivel.ignite.student.dto.request.StudentCreateRequestDto;
+import com.swivel.ignite.student.dto.response.UserResponseDto;
 import com.swivel.ignite.student.entity.Student;
 import com.swivel.ignite.student.exception.StudentAlreadyExistsException;
 import com.swivel.ignite.student.exception.StudentNotFoundException;
@@ -48,9 +49,9 @@ public class StudentService {
         try {
             if (isStudentExists(student.getUsername()))
                 throw new StudentAlreadyExistsException("Student already exists in DB");
-            Student dbStudent = studentRepository.save(student);
-            authService.registerStudent(requestDto, token);
-            return dbStudent;
+            UserResponseDto userResponseDto = authService.registerStudent(requestDto, token);
+            student.setAuthUserId(userResponseDto.getUserId());
+            return studentRepository.save(student);
         } catch (DataAccessException | IOException e) {
             throw new StudentServiceException("Failed to save student to DB for student id: " + student.getId(), e);
         }
@@ -70,6 +71,23 @@ public class StudentService {
             return optionalStudent.get();
         } catch (DataAccessException e) {
             throw new StudentServiceException("Failed to find student by id for student id: " + studentId, e);
+        }
+    }
+
+    /**
+     * This method returns a student by auth user id
+     *
+     * @param authUserId auth id
+     * @return Student/null
+     */
+    public Student findByAuthUserId(String authUserId) {
+        try {
+            Optional<Student> optionalStudent = studentRepository.findByAuthUserId(authUserId);
+            if (!optionalStudent.isPresent())
+                throw new StudentNotFoundException("Student not found for auth id: " + authUserId);
+            return optionalStudent.get();
+        } catch (DataAccessException e) {
+            throw new StudentServiceException("Failed to find student by id for auth id: " + authUserId, e);
         }
     }
 

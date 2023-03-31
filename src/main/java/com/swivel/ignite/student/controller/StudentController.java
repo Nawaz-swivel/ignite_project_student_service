@@ -91,6 +91,28 @@ public class StudentController extends Controller {
     }
 
     /**
+     * This method is used to get a student by auth user id
+     *
+     * @param authUserId auth id
+     * @return success(student)/ error response
+     */
+    @GetMapping(path = "/auth/get/{authUserId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<ResponseWrapper> getStudentByAuthUserId(@PathVariable(name = "authUserId") String authUserId) {
+        try {
+            Student student = studentService.findByAuthUserId(authUserId);
+            StudentResponseDto responseDto = new StudentResponseDto(student);
+            log.debug("Retrieved student of auth id: {}", authUserId);
+            return getSuccessResponse(SuccessResponseStatusType.GET_STUDENT, responseDto);
+        } catch (StudentNotFoundException e) {
+            log.error("Student not found for auth id: {}", authUserId, e);
+            return getBadRequestResponse(ErrorResponseStatusType.STUDENT_NOT_FOUND);
+        } catch (StudentServiceException e) {
+            log.error("Getting student was failed for auth id: {}", authUserId, e);
+            return getInternalServerErrorResponse();
+        }
+    }
+
+    /**
      * This method deletes a student by id
      *
      * @param studentId student id

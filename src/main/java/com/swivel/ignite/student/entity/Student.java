@@ -31,6 +31,7 @@ public class Student implements Serializable {
     private String password;
     private Date tuitionJoinedOn;
     private String tuitionId;
+    private String authUserId;
 
     public Student(StudentCreateRequestDto requestDto) {
         this.id = STUDENT_ID_PREFIX + UUID.randomUUID();

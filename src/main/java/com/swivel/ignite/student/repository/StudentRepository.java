@@ -19,4 +19,12 @@ public interface StudentRepository extends JpaRepository<Student, String> {
      * @return Student/null
      */
     Optional<Student> findByUsername(String username);
+
+    /**
+     * This method returns a student by auth id
+     *
+     * @param authUserId auth id
+     * @return Student/null
+     */
+    Optional<Student> findByAuthUserId(String authUserId);
 }

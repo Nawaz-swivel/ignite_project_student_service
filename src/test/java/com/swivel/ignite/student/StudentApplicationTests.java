@@ -1,5 +1,6 @@
 package com.swivel.ignite.student;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,7 +16,7 @@ class StudentApplicationTests {
      */
 //    @Test
 //    void Should_RunSpringApplication() {
-//        RegistrationApplication.main(new String[]{});
+//        StudentApplication.main(new String[]{});
 //
 //        assertTrue(true, "Spring Application Context Loaded Successfully");
 //    }
