@@ -53,7 +53,7 @@ public class StudentService {
             student.setAuthUserId(userResponseDto.getUserId());
             return studentRepository.save(student);
         } catch (DataAccessException | IOException e) {
-            throw new StudentServiceException("Failed to save student to DB for student id: " + student.getId(), e);
+            throw new StudentServiceException("Failed to save student to DB", e);
         }
     }
 
