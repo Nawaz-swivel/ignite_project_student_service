@@ -11,7 +11,7 @@ import lombok.Getter;
 public class RestErrorResponseWrapper extends ResponseWrapper {
 
     private final String statusText;
-    private final JsonNode data;
+    private final transient JsonNode data;
     private final int errorCode;
 
     /**
