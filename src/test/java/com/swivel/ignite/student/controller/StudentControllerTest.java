@@ -32,6 +32,7 @@ class StudentControllerTest {
     private static final String TOKEN = "Bearer 123456789";
     private static final String STUDENT_ID = "sid-123456789";
     private static final String TUITION_ID = "tid-123456789";
+    private static final String USER_ID = "uid-123456789";
     private static final String STUDENT_NAME = "Mohamed Nawaz";
     private static final String STUDENT_PASSWORD = "123456789";
     private static final String SUCCESS_STATUS = "SUCCESS";
@@ -41,6 +42,7 @@ class StudentControllerTest {
     private static final String ERROR = "ERROR";
     private static final String CREATE_STUDENT_URI = "/api/v1/student";
     private static final String GET_STUDENT_BY_ID_URI = "/api/v1/student/get/{studentId}";
+    private static final String GET_STUDENT_BY_AUTH_USER_ID_URI = "/api/v1/student/auth/get/{authUserId}";
     private static final String DELETE_STUDENT_URI = "/api/v1/student/delete/{studentId}";
     private static final String GET_ALL_STUDENT_URI = "/api/v1/student/get/all";
     private static final String ADD_TUITION_TO_STUDENT_URI = "/api/v1/student/add/student/{studentId}/tuition/{tuitionId}";
@@ -117,6 +119,25 @@ class StudentControllerTest {
     }
 
     @Test
+    void Should_ReturnInternalServerError_When_CreatingStudentForFailedToRegisterStudentInAuthDb() throws Exception {
+        doThrow(new AuthServiceHttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, ERROR)).when(studentService)
+                .createStudent(any(StudentCreateRequestDto.class), anyString());
+
+        mockMvc.perform(MockMvcRequestBuilders.post(CREATE_STUDENT_URI)
+                        .header(AUTH_HEADER, TOKEN)
+                        .content(getSampleStudentCreateRequestDto().toJson())
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.status").value(ERROR_STATUS))
+                .andExpect(jsonPath("$.message").value(ErrorResponseStatusType.AUTH_INTERNAL_SERVER_ERROR
+                        .getMessage()))
+                .andExpect(jsonPath("$.errorCode").value(ErrorResponseStatusType.AUTH_INTERNAL_SERVER_ERROR
+                        .getCode()))
+                .andExpect(jsonPath("$.displayMessage").value(ERROR_MESSAGE));
+    }
+
+    @Test
     void Should_ReturnInternalServerError_When_CreatingStudentIsFailed() throws Exception {
         doThrow(new StudentServiceException(ERROR)).when(studentService)
                 .createStudent(any(StudentCreateRequestDto.class), anyString());
@@ -175,6 +196,58 @@ class StudentControllerTest {
         when(studentService.findById(anyString())).thenThrow(new StudentServiceException(ERROR));
 
         String uri = GET_STUDENT_BY_ID_URI.replace("{studentId}", STUDENT_ID);
+        mockMvc.perform(MockMvcRequestBuilders.get(uri)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.status").value(ERROR_STATUS))
+                .andExpect(jsonPath("$.message").value(ErrorResponseStatusType.INTERNAL_SERVER_ERROR
+                        .getMessage()))
+                .andExpect(jsonPath("$.errorCode").value(ErrorResponseStatusType.INTERNAL_SERVER_ERROR
+                        .getCode()))
+                .andExpect(jsonPath("$.displayMessage").value(ERROR_MESSAGE));
+    }
+
+    /**
+     * Start of tests for get student by auth user id
+     * Api context: /api/v1/student/auth/get/{authUserId}
+     */
+    @Test
+    void Should_ReturnOk_When_GettingStudentByAuthUserIdIsSuccessful() throws Exception {
+        when(studentService.findByAuthUserId(anyString())).thenReturn(getSampleStudent());
+
+        String uri = GET_STUDENT_BY_AUTH_USER_ID_URI.replace("{authUserId}", USER_ID);
+        mockMvc.perform(MockMvcRequestBuilders.get(uri)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.status").value(SUCCESS_STATUS))
+                .andExpect(jsonPath("$.message").value(SuccessResponseStatusType.GET_STUDENT.getMessage()))
+                .andExpect(jsonPath("$.statusCode").value(SuccessResponseStatusType.GET_STUDENT.getCode()))
+                .andExpect(jsonPath("$.data.username").value(STUDENT_NAME))
+                .andExpect(jsonPath("$.displayMessage").value(SUCCESS_MESSAGE));
+    }
+
+    @Test
+    void Should_ReturnBadRequest_When_GettingStudentByAuthUserIdForStudentNotFound() throws Exception {
+        when(studentService.findByAuthUserId(anyString())).thenThrow(new StudentNotFoundException(ERROR));
+
+        String uri = GET_STUDENT_BY_AUTH_USER_ID_URI.replace("{authUserId}", USER_ID);
+        mockMvc.perform(MockMvcRequestBuilders.get(uri)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.status").value(ERROR_STATUS))
+                .andExpect(jsonPath("$.message").value(ErrorResponseStatusType.STUDENT_NOT_FOUND.getMessage()))
+                .andExpect(jsonPath("$.errorCode").value(ErrorResponseStatusType.STUDENT_NOT_FOUND.getCode()))
+                .andExpect(jsonPath("$.displayMessage").value(ERROR_MESSAGE));
+    }
+
+    @Test
+    void Should_ReturnInternalServerError_When_GettingStudentByAuthUserIdIsFailed() throws Exception {
+        when(studentService.findByAuthUserId(anyString())).thenThrow(new StudentServiceException(ERROR));
+
+        String uri = GET_STUDENT_BY_AUTH_USER_ID_URI.replace("{authUserId}", USER_ID);
         mockMvc.perform(MockMvcRequestBuilders.get(uri)
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError())
@@ -261,6 +334,26 @@ class StudentControllerTest {
                 .andExpect(jsonPath("$.message").value(ErrorResponseStatusType.PAYMENT_INTERNAL_SERVER_ERROR
                         .getMessage()))
                 .andExpect(jsonPath("$.errorCode").value(ErrorResponseStatusType.PAYMENT_INTERNAL_SERVER_ERROR
+                        .getCode()))
+                .andExpect(jsonPath("$.displayMessage").value(ERROR_MESSAGE));
+    }
+
+    @Test
+    void Should_ReturnInternalServerError_When_DeletingStudentForFailedToDeleteStudentInAuthDb() throws Exception {
+        when(studentService.findById(anyString())).thenReturn(getSampleStudent());
+        doThrow(new AuthServiceHttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, ERROR))
+                .when(studentService).deleteStudent(any(Student.class), anyString());
+
+        String uri = DELETE_STUDENT_URI.replace("{studentId}", STUDENT_ID);
+        mockMvc.perform(MockMvcRequestBuilders.delete(uri)
+                        .header(AUTH_HEADER, TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.status").value(ERROR_STATUS))
+                .andExpect(jsonPath("$.message").value(ErrorResponseStatusType.AUTH_INTERNAL_SERVER_ERROR
+                        .getMessage()))
+                .andExpect(jsonPath("$.errorCode").value(ErrorResponseStatusType.AUTH_INTERNAL_SERVER_ERROR
                         .getCode()))
                 .andExpect(jsonPath("$.displayMessage").value(ERROR_MESSAGE));
     }
@@ -466,6 +559,7 @@ class StudentControllerTest {
     private Student getSampleStudent() {
         Student student = new Student();
         student.setId(STUDENT_ID);
+        student.setUsername(STUDENT_NAME);
         return student;
     }
 

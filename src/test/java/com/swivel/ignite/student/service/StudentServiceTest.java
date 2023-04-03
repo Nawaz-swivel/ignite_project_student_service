@@ -127,6 +127,32 @@ class StudentServiceTest {
     }
 
     /**
+     * Start of tests for findByAuthUserId method
+     */
+    @Test
+    void Should_ReturnStudent_When_FindingStudentByAuthUserIdIsSuccessful() {
+        when(studentRepository.findByAuthUserId(anyString())).thenReturn(Optional.of(getSampleStudent()));
+        assertEquals(STUDENT_ID, studentService.findByAuthUserId(USER_ID).getId());
+    }
+
+    @Test
+    void Should_ThrowStudentNotFoundException_When_FindingStudentByAuthUserIdForStudentNotFound() {
+        when(studentRepository.findByAuthUserId(anyString())).thenReturn(Optional.empty());
+        StudentNotFoundException exception = assertThrows(StudentNotFoundException.class, () -> studentService
+                .findByAuthUserId(USER_ID));
+        assertEquals("Student not found for auth id: " + USER_ID, exception.getMessage());
+    }
+
+    @Test
+    void Should_ThrowStudentServiceException_When_FindingStudentByAuthUserIdIsFailed() {
+        when(studentRepository.findByAuthUserId(anyString())).thenThrow(new DataAccessException(ERROR) {
+        });
+        StudentServiceException exception = assertThrows(StudentServiceException.class, () -> studentService
+                .findByAuthUserId(USER_ID));
+        assertEquals("Failed to find student by id for auth id: " + USER_ID, exception.getMessage());
+    }
+
+    /**
      * Start of tests for deleteStudent method
      */
     @Test

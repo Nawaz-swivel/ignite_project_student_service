@@ -44,6 +44,14 @@ public class AuthService {
         this.restTemplate = restTemplate;
     }
 
+    /**
+     * This method is used to register a student in auth db in auth microservice
+     *
+     * @param requestDto StudentCreateRequestDto
+     * @param token      access token
+     * @return UserResponseDto
+     * @throws IOException
+     */
     public UserResponseDto registerStudent(StudentCreateRequestDto requestDto, String token) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTH_HEADER, token);
@@ -63,6 +71,13 @@ public class AuthService {
         }
     }
 
+    /**
+     * This method is used to delete a student from auth db in auth microservice
+     *
+     * @param username username
+     * @param token    access token
+     * @throws IOException
+     */
     public void deleteStudent(String username, String token) throws IOException {
         Map<String, String> uriParam = new HashMap<>();
         uriParam.put("username", username);
